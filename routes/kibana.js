@@ -4,10 +4,11 @@ const axios = require('axios');
 const url_kibana_save_obj = "http://localhost:5601/api/saved_objects/"
 
 function createIndex(name) {
-   url = url_kibana_save_obj + "index-pattern";
+   title = name.toLowerCase() + "*"
+   url = url_kibana_save_obj + "index-pattern/" + title;
    body = {
       "attributes": {
-         "title": name.toLowerCase() + "*"
+         "title": title
       }
    }
    axios.post(url, body, {
@@ -24,121 +25,21 @@ function createIndex(name) {
 }
 
 function createVisualization(name) {
-   url = url_kibana_save_obj + "visualization";
+   title = name.toLowerCase() + "-visualization"
+   url = url_kibana_save_obj + "visualization/" + title;
    body = {
       "attributes": {
-         "title": name.toLowerCase() + "-visualization",
+         "title": title,
+         "visState": JSON.stringify({ "title": title, "type": "histogram", "params": { "type": "histogram", "grid": { "categoryLines": false }, "categoryAxes": [{ "id": "CategoryAxis-1", "type": "category", "position": "bottom", "show": true, "style": {}, "scale": { "type": "linear" }, "labels": { "show": true, "filter": true, "truncate": 100 }, "title": {} }], "valueAxes": [{ "id": "ValueAxis-1", "name": "LeftAxis-1", "type": "value", "position": "left", "show": true, "style": {}, "scale": { "type": "linear", "mode": "normal" }, "labels": { "show": true, "rotate": 0, "filter": false, "truncate": 100 }, "title": { "text": "Count" } }], "seriesParams": [{ "show": true, "type": "histogram", "mode": "stacked", "data": { "label": "Count", "id": "1" }, "valueAxis": "ValueAxis-1", "drawLinesBetweenPoints": true, "lineWidth": 2, "showCircles": true }], "addTooltip": true, "addLegend": true, "legendPosition": "right", "times": [], "addTimeMarker": false, "labels": { "show": false }, "thresholdLine": { "show": false, "value": 10, "width": 1, "style": "full", "color": "#34130C" }, "dimensions": { "x": { "accessor": 0, "format": { "id": "date", "params": { "pattern": "HH:mm" } }, "params": { "date": true, "interval": "PT1M", "intervalESValue": 1, "intervalESUnit": "m", "format": "HH:mm" }, "aggType": "date_histogram" }, "y": [{ "accessor": 1, "format": { "id": "number" }, "params": {}, "aggType": "count" }] } }, "aggs": [{ "id": "1", "enabled": true, "type": "count", "schema": "metric", "params": {} }, { "id": "2", "enabled": true, "type": "date_histogram", "schema": "segment", "params": { "field": "@timestamp", "timeRange": { "from": "now-15d", "to": "now" }, "useNormalizedEsInterval": true, "scaleMetricValues": false, "interval": "12h", "drop_partials": false, "min_doc_count": 1, "extended_bounds": {} } }] }),
+         "uiStateJSON": "{}",
          "kibanaSavedObjectMeta": {
-            "searchSourceJSON": {
-               "query": {
-                  "query": "",
-                  "language": "kuery"
-               },
-               "filter": [
-                  {
-                     "meta": {
-                        "alias": null,
-                        "negate": false,
-                        "disabled": false,
-                        "type": "range",
-                        "key": "@timestamp",
-                        "params": {
-                           "gte": "now-1d",
-                           "lt": "now"
-                        },
-                        "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index"
-                     },
-                     "range": {
-                        "@timestamp": {
-                           "gte": "now-1d",
-                           "lt": "now"
-                        }
-                     },
-                     "$state": {
-                        "store": "appState"
-                     }
-                  }
-               ],
-               "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index"
-            },
-            "visState": {
-               "title": name.toLowerCase() + "-visualization",
-               "type": "histogram",
-               "params": {
-                  "type": "histogram",
-                  "grid": {
-                     "categoryLines": false
-                  },
-                  "categoryAxes": [
-                     {
-                        "id": "CategoryAxis-1",
-                        "type": "category",
-                        "position": "bottom",
-                        "show": true,
-                        "style": {},
-                        "scale": {
-                           "type": "linear"
-                        },
-                        "labels": {
-                           "show": true,
-                           "filter": true,
-                           "truncate": 100
-                        },
-                        "title": {}
-                     }
-                  ],
-                  "valueAxes": [
-                     {
-                        "id": "ValueAxis-1",
-                        "name": "LeftAxis-1",
-                        "type": "value",
-                        "position": "left",
-                        "show": true,
-                        "style": {},
-                        "scale": {
-                           "type": "linear",
-                           "mode": "normal"
-                        },
-                        "labels": {
-                           "show": true,
-                           "rotate": 0,
-                           "filter": false,
-                           "truncate": 100
-                        },
-                        "title": {
-                           "text": "Count"
-                        }
-                     }
-                  ],
-                  "seriesParams": [
-                     {
-                        "show": true,
-                        "type": "histogram",
-                        "mode": "normal",
-                        "data": {
-                           "label": "Count",
-                           "id": "1"
-                        },
-                        "valueAxis": "ValueAxis-1",
-                        "drawLinesBetweenPoints": true,
-                        "lineWidth": 2,
-                        "showCircles": true
-                     }
-                  ],
-                  "addTooltip": true, "addLegend": true, "legendPosition": "right", "times": [], "addTimeMarker": false, "labels": { "show": false }, "thresholdLine": { "show": false, "value": 10, "width": 1, "style": "full", "color": "#34130C" }, "dimensions": { "x": { "accessor": 0, "format": { "id": "date", "params": { "pattern": "YYYY-MM-DD HH:mm" } }, "params": { "date": true, "interval": "PT1H", "intervalESValue": 1, "intervalESUnit": "h", "format": "YYYY-MM-DD HH:mm" }, "aggType": "date_histogram" }, "y": [{ "accessor": 2, "format": { "id": "number" }, "params": {}, "aggType": "count" }], "series": [{ "accessor": 1, "format": { "id": "terms", "params": { "id": "string", "otherBucketLabel": "Other", "missingBucketLabel": "Missing" } }, "params": {}, "aggType": "terms" }] }
-               }, "aggs": [{ "id": "1", "enabled": true, "type": "count", "schema": "metric", "params": {} }, { "id": "2", "enabled": true, "type": "date_histogram", "schema": "segment", "params": { "field": "@timestamp", "timeRange": { "from": "now-15m", "to": "now" }, "useNormalizedEsInterval": true, "scaleMetricValues": false, "interval": "h", "drop_partials": false, "min_doc_count": 1, "extended_bounds": {} } }, { "id": "3", "enabled": true, "type": "terms", "schema": "group", "params": { "field": "message.keyword", "orderBy": "1", "order": "desc", "size": 20, "otherBucket": false, "otherBucketLabel": "Other", "missingBucket": false, "missingBucketLabel": "Missing" } }]
-            }
+            "searchSourceJSON": JSON.stringify({ "query": { "query": "", "language": "kuery" }, "filter": [], "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index" }),
          }
 
       },
       "references": [
          {
             "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "type": "index-pattern",
-            "id": name.toLowerCase() + "*"
-         },
-         {
-            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
             "type": "index-pattern",
             "id": name.toLowerCase() + "*"
          }
@@ -158,22 +59,14 @@ function createVisualization(name) {
 }
 
 function createSearch(name) {
-   url = url_kibana_save_obj + "search";
+   title = name.toLowerCase() + "-search"
+   url = url_kibana_save_obj + "search/" + title;
    body = {
       "attributes": {
-         "title": name.toLowerCase() + "-search",
-         "columns": ["@timestamp", "host", "zappname", "thread", "class", "linenumber", "message"],
+         "title": title,
+         "columns": ["key", "loglevel", "host", "server", "value", "@timestamp"],
          "kibanaSavedObjectMeta": {
-            "searchSourceJSON": {
-               "highlightAll": true,
-               "version": true,
-               "query": {
-                  "language": "kuery",
-                  "query": ""
-               },
-               "filter": [],
-               "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index"
-            }
+            "searchSourceJSON": JSON.stringify({ "highlightAll": true, "version": true, "query": { "language": "kuery", "query": "" }, "filter": [], "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index" })
          },
          "sort": [
             ["@timestamp", "desc"]
@@ -183,6 +76,7 @@ function createSearch(name) {
          {
             "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "type": "index-pattern",
+            // "id": "37d7bcc0-7a71-11ea-b089-87cc167e955c"
             "id": name.toLowerCase() + "*"
          }
       ]
@@ -195,44 +89,43 @@ function createSearch(name) {
       console.log(response);
       return true;
    }).catch((error) => {
-      // console.log(error);
+      console.log(error);
       return false;
    })
 }
 
 function createDashboard(name) {
-   url = url_kibana_save_obj + "index-pattern";
+   title = name.toLowerCase() + "-dashboard"
+   url = url_kibana_save_obj + "dashboard/" + title;
    body = {
       "attributes": {
-         "title": name.toLowerCase() + "-dashboard",
+         "title": title,
          "kibanaSavedObjectMeta": {
-            "searchSourceJSON": {
+            "searchSourceJSON": JSON.stringify({
                "query": {
                   "query": "",
                   "language": "kuery"
                },
                "filter": []
-            }
+            })
          },
-         "optionsJSON": {
+         "optionsJSON": JSON.stringify({
             "useMargins": true,
             "hidePanelTitles": false
-         },
-         "panelsJSON": [
-            { "version": "7.5.2", "gridData": { "x": 0, "y": 0, "w": 24, "h": 15, "i": "27e69f03-2a80-4298-b6ab-c280725dd971" }, "panelIndex": "27e69f03-2a80-4298-b6ab-c280725dd971", "embeddableConfig": {}, "panelRefName": "panel_0" }, { "version": "7.5.2", "gridData": { "x": 24, "y": 0, "w": 24, "h": 15, "i": "e3d49a2e-b4dc-4074-ad23-87eb8c9fa722" }, "panelIndex": "e3d49a2e-b4dc-4074-ad23-87eb8c9fa722", "embeddableConfig": {}, "panelRefName": "panel_1" }, { "version": "7.5.2", "gridData": { "x": 0, "y": 15, "w": 48, "h": 29, "i": "6b4fa019-ea58-4822-9df2-bcd452e31b83" }, "panelIndex": "6b4fa019-ea58-4822-9df2-bcd452e31b83", "embeddableConfig": {}, "panelRefName": "panel_2" }
-         ],
+         }),
+         "panelsJSON": JSON.stringify([{ "version": "7.5.2", "gridData": { "w": 24, "h": 15, "x": 0, "y": 0, "i": "9f907a64-4bdb-4528-a06b-31a436130c77" }, "panelIndex": "9f907a64-4bdb-4528-a06b-31a436130c77", "embeddableConfig": {}, "panelRefName": "panel_0" }, { "version": "7.5.2", "gridData": { "w": 24, "h": 15, "x": 24, "y": 0, "i": "23e7d7aa-287a-4c4d-b5d8-c9ef0cfee7f7" }, "panelIndex": "23e7d7aa-287a-4c4d-b5d8-c9ef0cfee7f7", "embeddableConfig": {}, "panelRefName": "panel_1" }]),
          "timeRestore": false
       },
       "references": [
          {
             "name": "panel_0",
-            "type": "visualization",
-            "id": name.toLowerCase() + "-visualization"
+            "type": "search",
+            "id": name.toLowerCase() + "-search"
          },
          {
             "name": "panel_1",
-            "type": "search",
-            "id": name.toLowerCase() + "-search"
+            "type": "visualization",
+            "id": name.toLowerCase() + "-visualization"
          }
       ]
    }
@@ -263,7 +156,28 @@ router.get('/:type/:id', function (req, res, next) {
    }
 
 
-   axios.get('http://localhost:5601/api/saved_objects/' + type + '/' + id, {
+   axios.get(url_kibana_save_obj + type + '/' + id, {
+      headers: {
+         "kbn-xsrf": true
+      }
+   }).then(response => {
+      console.log(response);
+      return res.json({
+         success: true,
+      });
+   }).catch(error => {
+      console.log(error);
+
+   });
+   return res.json({
+      success: true,
+   });
+});
+/* DELETE file listing. */
+router.delete('/:type/:id/', function (req, res) {
+   var id = req.params.id
+   var type = req.params.type
+   axios.delete(url_kibana_save_obj + type + '/' + id, {
       headers: {
          "kbn-xsrf": true
       }
