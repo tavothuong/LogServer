@@ -175,13 +175,9 @@ router.get('/:type/:id', function (req, res, next) {
 });
 /* DELETE file listing. */
 router.delete('/:type/:id/', function (req, res) {
-   var id = req.params.id
+   var id = req.params.id.toLowerCase()
    var type = req.params.type
-   axios.delete(url_kibana_save_obj + type + '/' + id, {
-      headers: {
-         "kbn-xsrf": true
-      }
-   }).then(response => {
+   axios.delete(url_kibana_save_obj + type + '/' + id).then(response => {
       console.log(response);
       return res.json({
          success: true,
