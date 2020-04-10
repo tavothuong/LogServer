@@ -113,20 +113,21 @@ function createDashboard(name) {
             "useMargins": true,
             "hidePanelTitles": false
          }),
-         "panelsJSON": JSON.stringify([{ "version": "7.5.2", "gridData": { "w": 24, "h": 15, "x": 0, "y": 0, "i": "9f907a64-4bdb-4528-a06b-31a436130c77" }, "panelIndex": "9f907a64-4bdb-4528-a06b-31a436130c77", "embeddableConfig": {}, "panelRefName": "panel_0" }, { "version": "7.5.2", "gridData": { "w": 24, "h": 15, "x": 24, "y": 0, "i": "23e7d7aa-287a-4c4d-b5d8-c9ef0cfee7f7" }, "panelIndex": "23e7d7aa-287a-4c4d-b5d8-c9ef0cfee7f7", "embeddableConfig": {}, "panelRefName": "panel_1" }]),
+         "panelsJSON": JSON.stringify([{"version":"7.5.2","gridData":{"x":0,"y":0,"w":48,"h":16,"i":"d2b26ade-5b5b-4e96-837a-62a9e1382f46"},"panelIndex":"d2b26ade-5b5b-4e96-837a-62a9e1382f46","embeddableConfig":{},"panelRefName":"panel_0"},{"version":"7.5.2","gridData":{"x":0,"y":16,"w":48,"h":19,"i":"1bfb07bd-8f5d-4fa3-a822-915360f508f9"},"panelIndex":"1bfb07bd-8f5d-4fa3-a822-915360f508f9","embeddableConfig":{},"panelRefName":"panel_1"}]),
          "timeRestore": false
       },
       "references": [
          {
             "name": "panel_0",
-            "type": "search",
-            "id": name.toLowerCase() + "-search"
+            "type": "visualization",
+            "id": name.toLowerCase() + "-visualization"
          },
          {
             "name": "panel_1",
-            "type": "visualization",
-            "id": name.toLowerCase() + "-visualization"
-         }
+            "type": "search",
+            "id": name.toLowerCase() + "-search"
+         },
+         
       ]
    }
    axios.post(url, body, {
