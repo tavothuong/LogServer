@@ -255,7 +255,6 @@ router.post('/createDashboard/:name', function (req, res, next) {
 
 router.post('/createAny/:name', function (req, res, next) {
    var name = req.params.name
-   //createDashboard(name);
    return res.json({
       success: false,
       message: "Not impliment"

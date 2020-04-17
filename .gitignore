@@ -1,2 +1,4 @@
-# .gitignore 
+# dependent packet 
 node_modules
+# ide setting
+.vscode
