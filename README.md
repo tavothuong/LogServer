@@ -1,5 +1,8 @@
 # LogServer
 #start container by docker/docker-compose.yml
+#make config in config folder
+
+# R
 
     npm install
     npm start
