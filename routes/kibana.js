@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const axios = require('axios');
-const url_kibana_save_obj = "http://localhost:5601/api/saved_objects/"
+var config = require('../config/config')
+var url_kibana_save_obj = config.url_kibana_save_obj
 
 function createIndex(name) {
    title = name.toLowerCase() + "*"
