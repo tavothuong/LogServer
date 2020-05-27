@@ -59,6 +59,40 @@ function createVisualization(name) {
    })
 }
 
+function createVisualizationByField(name, field, top) {
+   title = name.toLowerCase() + "-by-" + field + "-visualization"
+   url = url_kibana_save_obj + "visualization/" + title;
+   body = {
+      "attributes": {
+         "title": title,
+         "visState": JSON.stringify({ "title": title, "type": "histogram", "params": { "type": "histogram", "grid": { "categoryLines": false }, "categoryAxes": [{ "id": "CategoryAxis-1", "type": "category", "position": "bottom", "show": true, "style": {}, "scale": { "type": "linear" }, "labels": { "show": true, "filter": true, "truncate": 100 }, "title": {} }], "valueAxes": [{ "id": "ValueAxis-1", "name": "LeftAxis-1", "type": "value", "position": "left", "show": true, "style": {}, "scale": { "type": "linear", "mode": "normal" }, "labels": { "show": true, "rotate": 0, "filter": false, "truncate": 100 }, "title": { "text": "Count" } }], "seriesParams": [{ "show": true, "type": "histogram", "mode": "stacked", "data": { "label": "Count", "id": "1" }, "valueAxis": "ValueAxis-1", "drawLinesBetweenPoints": true, "lineWidth": 2, "showCircles": true }], "addTooltip": true, "addLegend": true, "legendPosition": "right", "times": [], "addTimeMarker": false, "labels": { "show": false }, "thresholdLine": { "show": false, "value": 10, "width": 1, "style": "full", "color": "#34130C" }, "dimensions": { "x": null, "y": [{ "accessor": 0, "format": { "id": "number" }, "params": {}, "aggType": "count" }] } }, "aggs": [{ "id": "1", "enabled": true, "type": "count", "schema": "metric", "params": {} }, { "id": "2", "enabled": true, "type": "terms", "schema": "segment", "params": { "field": field + ".keyword", "orderBy": "1", "order": "desc", "size": top, "otherBucket": false, "otherBucketLabel": "Other", "missingBucket": false, "missingBucketLabel": "Missing" } }] }),
+         "uiStateJSON": "{}",
+         "kibanaSavedObjectMeta": {
+            "searchSourceJSON": JSON.stringify({ "query": { "query": "", "language": "kuery" }, "filter": [], "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index" }),
+         }
+
+      },
+      "references": [
+         {
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern",
+            "id": name.toLowerCase() + "*"
+         }
+      ]
+   }
+   axios.post(url, body, {
+      headers: {
+         "kbn-xsrf": true
+      }
+   }).then((response) => {
+      console.log(response);
+      return true;
+   }).catch((error) => {
+      console.log(error);
+      return false;
+   })
+}
+
 function createSearch(name) {
    title = name.toLowerCase() + "-search"
    url = url_kibana_save_obj + "search/" + title;
@@ -95,6 +129,41 @@ function createSearch(name) {
    })
 }
 
+function createSearchByCond(name, index, fields, condition) {
+   title = name.toLowerCase();
+   url = url_kibana_save_obj + "search/" + title + "?overwrite=true";
+   body = {
+      "attributes": {
+         "title": title,
+         "columns": fields,
+         "kibanaSavedObjectMeta": {
+            "searchSourceJSON": JSON.stringify({ "highlightAll": true, "version": true, "query": { "language": "kuery", "query": condition }, "filter": [], "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index" })
+         },
+         "sort": [
+            // ["@timestamp", "desc"]
+         ]
+      },
+      "references": [
+         {
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern",
+            "id": index.toLowerCase() + "*"
+         }
+      ]
+   }
+   axios.post(url, body, {
+      headers: {
+         "kbn-xsrf": true
+      }
+   }).then((response) => {
+      // console.log(response);
+      return true;
+   }).catch((error) => {
+      console.log(error);
+      return false;
+   })
+}
+
 function createDashboard(name) {
    title = name.toLowerCase() + "-dashboard"
    url = url_kibana_save_obj + "dashboard/" + title;
@@ -114,7 +183,7 @@ function createDashboard(name) {
             "useMargins": true,
             "hidePanelTitles": false
          }),
-         "panelsJSON": JSON.stringify([{"version":"7.5.2","gridData":{"x":0,"y":0,"w":48,"h":16,"i":"d2b26ade-5b5b-4e96-837a-62a9e1382f46"},"panelIndex":"d2b26ade-5b5b-4e96-837a-62a9e1382f46","embeddableConfig":{},"panelRefName":"panel_0"},{"version":"7.5.2","gridData":{"x":0,"y":16,"w":48,"h":19,"i":"1bfb07bd-8f5d-4fa3-a822-915360f508f9"},"panelIndex":"1bfb07bd-8f5d-4fa3-a822-915360f508f9","embeddableConfig":{},"panelRefName":"panel_1"}]),
+         "panelsJSON": JSON.stringify([{ "version": "7.5.2", "gridData": { "x": 0, "y": 0, "w": 48, "h": 16, "i": "d2b26ade-5b5b-4e96-837a-62a9e1382f46" }, "panelIndex": "d2b26ade-5b5b-4e96-837a-62a9e1382f46", "embeddableConfig": {}, "panelRefName": "panel_0" }, { "version": "7.5.2", "gridData": { "x": 0, "y": 16, "w": 48, "h": 19, "i": "1bfb07bd-8f5d-4fa3-a822-915360f508f9" }, "panelIndex": "1bfb07bd-8f5d-4fa3-a822-915360f508f9", "embeddableConfig": {}, "panelRefName": "panel_1" }]),
          "timeRestore": false
       },
       "references": [
@@ -128,7 +197,7 @@ function createDashboard(name) {
             "type": "search",
             "id": name.toLowerCase() + "-search"
          },
-         
+
       ]
    }
    axios.post(url, body, {
@@ -163,7 +232,8 @@ router.get('/:type/:id', function (req, res, next) {
          "kbn-xsrf": true
       }
    }).then(response => {
-      console.log(response);
+      // console.log(response);
+      return response;
       return res.json({
          success: true,
       });
@@ -223,6 +293,23 @@ router.post('/createVisualization/:name', function (req, res, next) {
    }
 });
 
+router.post('/createVisualizationByField/:name/:field/:top', function (req, res, next) {
+   var name = req.params.name
+   var field = req.params.field
+   var top = req.params.top
+   createVisualizationByField(name, filed, top)
+   if (1) {
+      return res.json({
+         success: true,
+      });
+   }
+   else {
+      return res.json({
+         success: false,
+      });
+   }
+});
+
 router.post('/createSearch/:name', function (req, res, next) {
    var name = req.params.name
    createSearch(name);
@@ -237,6 +324,27 @@ router.post('/createSearch/:name', function (req, res, next) {
       });
    }
 });
+
+router.post('/createSearchByCond/:name', function (req, res, next) {
+   var name = req.params.name.toLocaleLowerCase()
+   var index = "" || req.body.index
+   var fields = req.body.fields || [];
+   var condition = "" || req.body.condition;
+   // console.log(condition)
+   createSearchByCond(name, index, fields, condition);
+   if (1) {
+      return res.json({
+         success: true,
+         url: config.url_discover+name
+      });
+   }
+   else {
+      return res.json({
+         success: false,
+      });
+   }
+});
+
 
 router.post('/createDashboard/:name', function (req, res, next) {
    var name = req.params.name
