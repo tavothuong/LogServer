@@ -213,9 +213,10 @@ function createDashboard(name) {
    })
 }
 
-function createDashboardSearch(name) {
+function createDashboardSearch(name, pId) {
    title = name.toLowerCase();
    url = url_kibana_save_obj + "dashboard/" + title + "?overwrite=true";
+   panelId = pId || "0a007e09-b359-4efe-874d-503695b96955";
    body = {
       "attributes": {
          "title": title,
@@ -232,7 +233,7 @@ function createDashboardSearch(name) {
             "useMargins": true,
             "hidePanelTitles": false
          }),
-         "panelsJSON": JSON.stringify([{ "version": "7.5.2", "gridData": { "x": 0, "y": 0, "w": 48, "h": 28, "i": "0a007e09-b359-4efe-874d-503695b96955" }, "panelIndex": "0a007e09-b359-4efe-874d-503695b96955", "embeddableConfig": {}, "panelRefName": "panel_0" }]),
+         "panelsJSON": JSON.stringify([{ "version": "7.5.2", "gridData": { "x": 0, "y": 0, "w": 48, "h": 28, "i": "0a007e09-b359-4efe-874d-503695b96955" }, "panelIndex": panelId, "embeddableConfig": {}, "panelRefName": "panel_0" }]),
          "timeRestore": false
       },
       "references": [
@@ -394,13 +395,14 @@ router.post('/createDashboardSearch/:name', function (req, res, next) {
    var index = "" || req.body.index
    var fields = req.body.fields || [];
    var condition = "" || req.body.condition;
+   var pId = req.body.penalIndex;
    // console.log(condition)
    createSearchByCond(name + '-search', index, fields, condition);
-   createDashboardSearch(name);
+   createDashboardSearch(name,pId);
    if (1) {
       return res.json({
          success: true,
-         url: config.url_dashboard + name
+         url: config.url_dashboard + name+"?embed=true"
       });
    }
    else {
