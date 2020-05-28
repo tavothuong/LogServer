@@ -213,6 +213,50 @@ function createDashboard(name) {
    })
 }
 
+function createDashboardSearch(name) {
+   title = name.toLowerCase();
+   url = url_kibana_save_obj + "dashboard/" + title + "?overwrite=true";
+   body = {
+      "attributes": {
+         "title": title,
+         "kibanaSavedObjectMeta": {
+            "searchSourceJSON": JSON.stringify({
+               "query": {
+                  "query": "",
+                  "language": "kuery"
+               },
+               "filter": []
+            })
+         },
+         "optionsJSON": JSON.stringify({
+            "useMargins": true,
+            "hidePanelTitles": false
+         }),
+         "panelsJSON": JSON.stringify([{"version":"7.5.2","gridData":{"x":0,"y":0,"w":48,"h":28,"i":"0a007e09-b359-4efe-874d-503695b96955"},"panelIndex":"0a007e09-b359-4efe-874d-503695b96955","embeddableConfig":{},"panelRefName":"panel_0"}]),
+         "timeRestore": false
+      },
+      "references": [
+         {
+            "name": "panel_0",
+            "type": "search",
+            "id": name.toLowerCase() + "-search"
+         },
+
+      ]
+   }
+   axios.post(url, body, {
+      headers: {
+         "kbn-xsrf": true
+      }
+   }).then((response) => {
+      // console.log(response);
+      return true;
+   }).catch((error) => {
+      // console.log(error);
+      return false;
+   })
+}
+
 router.get('/:type/:id', function (req, res, next) {
    var type = req.params.type
    var id = req.params.id
@@ -336,6 +380,27 @@ router.post('/createSearchByCond/:name', function (req, res, next) {
       return res.json({
          success: true,
          url: config.url_discover+name
+      });
+   }
+   else {
+      return res.json({
+         success: false,
+      });
+   }
+});
+
+router.post('/createDashboardSearch/:name', function (req, res, next) {
+   var name = req.params.name.toLocaleLowerCase()
+   var index = "" || req.body.index
+   var fields = req.body.fields || [];
+   var condition = "" || req.body.condition;
+   // console.log(condition)
+   createSearchByCond(name+'-search', index, fields, condition);
+   createDashboardSearch(name);
+   if (1) {
+      return res.json({
+         success: true,
+         url: config.url_dashboard+name
       });
    }
    else {
