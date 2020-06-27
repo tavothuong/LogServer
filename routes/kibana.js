@@ -93,6 +93,42 @@ function createVisualizationByField(name, field, top) {
    })
 }
 
+function createVisualizationByCond(name, index,condition){
+   title = name.toLowerCase() + "-visualization"
+   url = url_kibana_save_obj + "visualization/" + title + "?overwrite=true";
+   body = {
+      "attributes": {
+         "title": title,
+         "visState": JSON.stringify({"title":title,"type":"histogram","params":{"type":"histogram","grid":{"categoryLines":false},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"filter":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":true,"type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"lineWidth":2,"showCircles":true}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false,"labels":{"show":false},"thresholdLine":{"show":false,"value":10,"width":1,"style":"full","color":"#34130C"},"dimensions":{"x":null,"y":[{"accessor":0,"format":{"id":"number"},"params":{},"aggType":"count"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","useNormalizedEsInterval":true,"scaleMetricValues":false,"interval":"d","drop_partials":false,"min_doc_count":1,"extended_bounds":{}}}]}),
+         
+         "uiStateJSON": "{}",
+         "kibanaSavedObjectMeta": {
+            "searchSourceJSON": JSON.stringify({ "query": { "query": condition, "language": "kuery" }, "filter": [], "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index" }),
+         }
+
+      },
+      "references": [
+         {
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern",
+            "id": index.toLowerCase() + "*"
+         }
+      ]
+   }
+   axios.post(url, body, {
+      headers: {
+         "kbn-xsrf": true
+      }
+   }).then((response) => {
+      console.log(response);
+      return true;
+   }).catch((error) => {
+      console.log(error);
+      return false;
+   })
+
+}
+
 function createSearch(name) {
    title = name.toLowerCase() + "-search"
    url = url_kibana_save_obj + "search/" + title;
@@ -258,6 +294,50 @@ function createDashboardSearch(name, pId) {
    })
 }
 
+function createDashboardStat(name) {
+   title = name.toLowerCase();
+   url = url_kibana_save_obj + "dashboard/" + title + "?overwrite=true";
+   body = {
+      "attributes": {
+         "title": title,
+         "kibanaSavedObjectMeta": {
+            "searchSourceJSON": JSON.stringify({
+               "query": {
+                  "query": "",
+                  "language": "kuery"
+               },
+               "filter": []
+            })
+         },
+         "optionsJSON": JSON.stringify({
+            "useMargins": true,
+            "hidePanelTitles": false
+         }),
+         "panelsJSON": JSON.stringify([{"version":"7.5.2","gridData":{"x":0,"y":0,"w":47,"h":27,"i":"9fb67eda-1a59-4f2f-a820-fe868b3fbab0"},"panelIndex":"9fb67eda-1a59-4f2f-a820-fe868b3fbab0","embeddableConfig":{},"panelRefName":"panel_0"}]),
+         "timeRestore": false
+      },
+      "references": [
+         {
+            "name": "panel_0",
+            "type": "visualization",
+            "id": name.toLowerCase() + "-visualization"
+         },
+
+      ]
+   }
+   axios.post(url, body, {
+      headers: {
+         "kbn-xsrf": true
+      }
+   }).then((response) => {
+      // console.log(response);
+      return true;
+   }).catch((error) => {
+      // console.log(error);
+      return false;
+   })
+}
+
 router.get('/:type/:id', function (req, res, next) {
    var type = req.params.type
    var id = req.params.id
@@ -390,12 +470,34 @@ router.post('/createSearchByCond/:name', function (req, res, next) {
    }
 });
 
+router.post('/createDashboardStat/:name', function (req, res, next) {
+   var name = req.params.name.toLocaleLowerCase()
+   var index = "" || req.body.index
+   var condition = "" || req.body.condition;
+   // console.log(condition)
+   createVisualizationByCond(name, index, condition);
+   createDashboardStat(name)
+   if (1) {
+      return res.json({
+         success: true,
+         url: config.url_dashboard + name+"?embed=true"
+      });
+   }
+   else {
+      return res.json({
+         success: false,
+      });
+   }
+});
+
+
+
 router.post('/createDashboardSearch/:name', function (req, res, next) {
    var name = req.params.name.toLocaleLowerCase()
    var index = "" || req.body.index
    var fields = req.body.fields || [];
    var condition = "" || req.body.condition;
-   var pId = req.body.penalIndex;
+   var pId = req.body.panelIndex;
    // console.log(condition)
    createSearchByCond(name + '-search', index, fields, condition);
    createDashboardSearch(name,pId);
